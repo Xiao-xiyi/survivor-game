@@ -3,6 +3,8 @@ const { ccclass, property } = _decorator;
 
 @ccclass('Player')
 export class Player extends Component {
+    //静态实例：别的脚本可以通过player.instance就能访问玩家
+    static instance: Player = null
     @property({ tooltip: '移动速度' })
     speed: number = 300
     private _dir = new Vec3(0, 0, 0)
@@ -30,11 +32,15 @@ export class Player extends Component {
     }
     // onLoad：节点加载完成时调用一次，用来做初始化
     protected onLoad(): void {
+        // 把自己存进静态变量
+        Player.instance = this;
         input.on(Input.EventType.KEY_DOWN, this.onKeydown, this)
         input.on(Input.EventType.KEY_UP, this.onKeyup, this)
     }
     // onDestroy：节点被销毁时调用一次
     protected onDestroy(): void {
+        // 销毁时清掉，避免野指针
+        if (Player.instance === this) Player.instance = null;
         input.off(Input.EventType.KEY_DOWN, this.onKeydown, this)
         input.off(Input.EventType.KEY_UP, this.onKeyup, this)
     }

@@ -3,6 +3,7 @@ const { ccclass, property } = _decorator;
 
 @ccclass('camerFollow')
 export class camerFollow extends Component {
+   
     @property({ type: Node, tooltip: '要跟随的目标节点' })
     target: Node = null
     protected lateUpdate(dt: number): void {
