@@ -1,4 +1,6 @@
 import { _decorator, Component, instantiate, math, Node, Prefab, Vec3 } from 'cc';
+// 从 pool.ts 引入对象池的两个函数
+import { getNode, putNode } from './pool';
 const { ccclass, property } = _decorator;
 
 @ccclass('NewComponent')
@@ -12,15 +14,16 @@ export class NewComponent extends Component {
     private _timer: number = 0;
     private spawOne(): void {
         if (!this.enemy) return
-        // 从预制体复制出新节点
-        const enemy = instantiate(this.enemy)
+
+        // 从对象池拿一个敌人节点（而不是 new）
+        const enemy = getNode(this.enemy);
         //添加到父节点下面
-        this.node.parent.addChild(enemy)
+        this.node.addChild(enemy)
         //随机生成一个角度
-        const angleDeg=Math.random()*360
+        const angleDeg = Math.random() * 360
         // 转换成弧度
-        const angleRad=math.toRadian(angleDeg)
-         // 在这个角度方向上、距离 spawnRadius 远的圆周上取一个点
+        const angleRad = math.toRadian(angleDeg)
+        // 在这个角度方向上、距离 spawnRadius 远的圆周上取一个点
         const x = Math.cos(angleRad) * this.spawnRadius;
         const y = Math.sin(angleRad) * this.spawnRadius;
 
