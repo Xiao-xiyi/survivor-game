@@ -16,14 +16,7 @@ export class Enemy extends Component {
         // 算出从自己指向玩家的方向：目标位置 - 自己的位置
         // 参数顺序：输出对象、起点、终点
         Vec3.subtract(this._dir, player.node.position, this.node.position,)
-        // 已经贴到玩家身上了（距离接近 0），就不再移动
-        // if (this._dir.lengthSqr() < 0.01) return;
-        // 已经贴到玩家身上（距离 < 5 像素），视为碰到玩家，回收掉
-        // lengthSqr = 长度的平方，比用 length 省一次开根号
-        if (this._dir.lengthSqr() < 25) {
-            putNode(this.node);  // 回池
-            return;
-        }
+   
         //归一化
         this._dir.normalize();
         //atan2算出弧度，*57.3 转成角度，-90

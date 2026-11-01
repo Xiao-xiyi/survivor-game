@@ -14,8 +14,7 @@ export class NewComponent extends Component {
     private _timer: number = 0;
     private spawOne(): void {
         if (!this.enemy) return
-
-        // 从对象池拿一个敌人节点（而不是 new）
+        // 从对象池拿一个敌人节点
         const enemy = getNode(this.enemy);
         //添加到父节点下面
         this.node.addChild(enemy)
