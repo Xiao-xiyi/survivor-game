@@ -1,4 +1,4 @@
-import { _decorator, Component, EventKeyboard, Input, input, KeyCode, Node, Vec3 } from 'cc';
+import { _decorator, Component, EventKeyboard, Input, input, KeyCode, Node, Vec3, math } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('Player')
@@ -47,7 +47,7 @@ export class Player extends Component {
 
     update(dt: number) {
         if (this._dir.lengthSqr() === 0) return
-       //归一化/
+        //归一化/
         const d = this._dir.normalize()
         // 取当前节点位置
         const pos = this.node.position
@@ -59,7 +59,12 @@ export class Player extends Component {
 
 
         )
-
+        //地图的一半
+        const halfMap = 2000
+        // Math.clamp(值, 最小值, 最大值)：把值限制在范围内
+        const px = math.clamp(this.node.position.x, -halfMap, halfMap)
+        const py = math.clamp(this.node.position.y, -halfMap, halfMap)
+        this.node.setPosition(px, py, this.node.position.z);
     }
 }
 
