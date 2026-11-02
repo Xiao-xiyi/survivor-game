@@ -1,9 +1,23 @@
-import { _decorator, Component, EventKeyboard, Input, input, KeyCode, Node, Vec3, math, Collider2D, Contact2DType } from 'cc';
+import { _decorator, Component, Prefab, EventKeyboard, Animation, Input, input, KeyCode, Node, Vec3, math, Collider2D, Contact2DType } from 'cc';
 const { ccclass, property } = _decorator;
-import { putNode } from './pool';
+import { getNode, putNode } from './pool';
+import { Bullet } from './Bullet';
+import { Enemy } from './Enemy';
 
 @ccclass('Player')
 export class Player extends Component {
+    @property({ type: Prefab, tooltip: '子弹预制体' })
+    bulletPrefab: Prefab = null
+    @property({ tooltip: '射击间隔（秒）' })
+    fireInterval: number = 0.3
+    // 射击计时器
+    private _fireTimer: number = 0
+    // 是否正在按住开火键
+    private _firing = false
+    @property({ type: Animation, tooltip: '走路帧动画' })
+    walkAnim: Animation = null
+    // 记录上一帧是不是在走，用来判断"状态有没有变化"
+    private _walking: boolean = false
     // 本帧碰到玩家的敌人，先攒着，等这一帧物理算完再回收
     private _pending: Node[] = []
     @property({ tooltip: '玩家血量' })
@@ -21,6 +35,12 @@ export class Player extends Component {
     // 按下键盘时触发，e.keyCode 是按键编号
     onKeydown(e: EventKeyboard) {
         switch (e.keyCode) {
+            case KeyCode.KEY_J:
+                if (!this._firing) {
+                    this._firing = true
+                    this._fireTimer = this.fireInterval
+                } break
+
             case KeyCode.KEY_W: this._dir.y = 1; break
             case KeyCode.KEY_S: this._dir.y = -1; break
             case KeyCode.KEY_A: this._dir.x = -1; break
@@ -32,6 +52,7 @@ export class Player extends Component {
     // 松开键盘时触发
     onKeyup(e: EventKeyboard) {
         switch (e.keyCode) {
+            case KeyCode.KEY_J: this._firing = false; break
             case KeyCode.KEY_W:
             case KeyCode.KEY_S: this._dir.y = 0; break
             case KeyCode.KEY_A:
@@ -69,22 +90,94 @@ export class Player extends Component {
         input.off(Input.EventType.KEY_UP, this.onKeyup, this)
     }
 
+       private fire(): void {
+        if (!this.bulletPrefab) return
 
+        const target = this.findNearestEnemy()
+        if (!target) return                     // 场上没敌人就不开火
+
+        // 方向 = 敌人位置 - 自己位置
+        const dir = new Vec3(0, 0, 0)
+        Vec3.subtract(dir, target.node.position, this.node.position)
+        dir.normalize()
+
+        const bullet = getNode(this.bulletPrefab)
+        this.node.parent.addChild(bullet)
+        // 沿发射方向挪 60 像素出生，避免子弹和玩家重叠
+        bullet.setPosition(
+            this.node.position.x + dir.x * 60,
+            this.node.position.y + dir.y * 60,
+            this.node.position.z
+        )
+        bullet.getComponent(Bullet).setDirection(dir)
+    }
+
+    // 找离自己最近的敌人，没有就返回 null
+    private findNearestEnemy(): Enemy {
+        let best: Enemy = null
+        let bestDist = Infinity                 // 无穷大，第一个敌人肯定比它小
+        for (const e of Enemy.all) {
+            const dx = e.node.position.x - this.node.position.x
+            const dy = e.node.position.y - this.node.position.y
+            const d = dx * dx + dy * dy         // 平方就够比大小，省开根号
+            if (d < bestDist) {
+                bestDist = d
+                best = e
+            }
+        }
+        return best
+    }
 
     start() {
 
     }
 
     update(dt: number) {
+        if (this._invincibleTicker > 0)
+            this._invincibleTicker -= dt;  // 时间递减
 
         //下一帧回收
         if (this._pending.length > 0) {
             for (const n of this._pending) putNode(n)
             this._pending.length = 0
         }
-        if (this._dir.lengthSqr() === 0) return
+        // 按住开火：每 fireInterval 秒打一发
+        this._fireTimer += dt
+        if (this._firing && this._fireTimer >= this.fireInterval) {
+            this._fireTimer -= this.fireInterval
+            this.fire()
+        }
+        if (this._firing) {
+            const t = this.findNearestEnemy()
+            if (t) {
+                const dx = t.node.position.x - this.node.position.x
+                const dy = t.node.position.y - this.node.position.y
+                this.node.angle = Math.atan2(dy, dx) * 57.3
+            }
+        }
+
+
+
+        if (this._dir.lengthSqr() === 0) {
+            // 从"走"变成"停"：只在变化的那一刻停一次
+            if (this._walking) {
+                this._walking = false
+                this.walkAnim?.stop()
+            }
+            return
+        }
+        // ② 正在走：只在起步那一刻播一次
+        if (!this._walking) {
+            this._walking = true
+            this.walkAnim?.play()
+        }
         //归一化/
         const d = this._dir.normalize()
+        //角色头朝向（没开火时才跟移动方向转）
+        if (!this._firing) {
+            this.node.angle = Math.atan2(d.y, d.x) * 57.3
+        }
+
         // 取当前节点位置
         const pos = this.node.position
         // 新位置=旧位置+方向*速度*这一帧的秒数
@@ -101,8 +194,7 @@ export class Player extends Component {
         const px = math.clamp(this.node.position.x, -halfMap, halfMap)
         const py = math.clamp(this.node.position.y, -halfMap, halfMap)
         this.node.setPosition(px, py, this.node.position.z);
-        if (this._invincibleTicker > 0)
-            this._invincibleTicker -= dt;  // 时间递减
+
     }
 
     takeDamage(dmg: number = 1): void {

@@ -6,6 +6,7 @@ export function getNode(Prefab: Prefab): Node {
     //判断是否有这个预制体，并且对象池里还有闲置节点
     if (_map.has(name) && _map.get(name)!.length > 0) {
         const node = _map.get(name)!.pop()!
+          node.active = true
         return node
     }
     return instantiate(Prefab)

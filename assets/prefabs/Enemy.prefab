@@ -161,6 +161,10 @@
       {
         "__uuid__": "71da255f-d7b2-4ac4-9290-49154780f96e",
         "__expectedType__": "cc.AnimationClip"
+      },
+      {
+        "__uuid__": "b9f230d2-0977-4367-9a83-57e0cc163eda",
+        "__expectedType__": "cc.AnimationClip"
       }
     ],
     "_defaultClip": {
@@ -185,7 +189,13 @@
     "__prefab": {
       "__id__": 9
     },
+    "anim": {
+      "__id__": 6
+    },
+    "idleClip": "bat",
+    "deathClip": "enemy-death",
     "speed": 100,
+    "hp": 2,
     "_id": ""
   },
   {
