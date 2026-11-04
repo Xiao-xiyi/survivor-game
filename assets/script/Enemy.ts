@@ -8,7 +8,7 @@ import { Player } from './Player';
 export class Enemy extends Component {
     @property({ type: Animation, tooltip: '动画组件' })
     anim: Animation = null
-     @property({ tooltip: '待机动画名（Clips 列表里的名字）' })
+    @property({ tooltip: '待机动画名（Clips 列表里的名字）' })
     idleClip: string = 'bat'
     @property({ tooltip: '死亡动画名' })
     deathClip: string = 'enemy-death'
@@ -18,13 +18,16 @@ export class Enemy extends Component {
     speed: number = 100;
     // 所有活着的敌人名单，静态的，全项目共享一份
     static all: Enemy[] = []
+    //总共击杀了多少敌人（静态，全项目共享）
+    static killed: number = 0
+
     @property({ tooltip: '生命值' })
     hp: number = 2
     // 当前血量（真正的运行时数值）
     private _hp: number = 0
     // 节点显示时触发（从池里捞出来时也会触发）
     protected onEnable(): void {
-         // ⚠️ 从池里捞出来的节点，血必须重置
+        // ⚠️ 从池里捞出来的节点，血必须重置
         Enemy.all.push(this)     // 加入名单
         this._hp = this.hp
         this._dead = false       // ⚠️ 死亡标记也要重置
@@ -42,6 +45,7 @@ export class Enemy extends Component {
         // 已经死了，别重复触发
         if (this._dead) return
         this._dead = true
+        Enemy.killed++
         // 尸体不再参与"最近的敌人"和"子弹命中"，否则玩家会对着尸体打
         const i = Enemy.all.indexOf(this)
         if (i >= 0) Enemy.all.splice(i, 1)
@@ -57,7 +61,7 @@ export class Enemy extends Component {
     }
 
     update(dt: number) {
-           if (this._dead) return   // 死亡动画播放期间不再追玩家
+        if (this._dead) return   // 死亡动画播放期间不再追玩家
         const player = Player.instance
         if (!player || !player.node || !player.node.isValid) return;
         // 算出从自己指向玩家的方向：目标位置 - 自己的位置

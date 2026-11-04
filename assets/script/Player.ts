@@ -19,14 +19,18 @@ export class Player extends Component {
     // 记录上一帧是不是在走，用来判断"状态有没有变化"
     private _walking: boolean = false
     // 本帧碰到玩家的敌人，先攒着，等这一帧物理算完再回收
+
+
+
     private _pending: Node[] = []
     @property({ tooltip: '玩家血量' })
     hp: number = 5
+    @property({ tooltip: '最大血量' })
+    maxHp: number = 5
     @property({ tooltip: '无敌帧时长' })
     invincibleTime: number = 1
     @property({ tooltip: '无敌帧倒计时' })
     private _invincibleTicker: number = 0
-
     //静态实例：别的脚本可以通过player.instance就能访问玩家
     static instance: Player = null
     @property({ tooltip: '移动速度' })
