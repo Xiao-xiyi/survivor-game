@@ -1,17 +1,26 @@
-import { _decorator, Component, Node, Animation, Vec3 } from 'cc';
-import { putNode } from './pool';
+import { _decorator, Component, Prefab, Node, Animation, Vec3 } from 'cc';
+import { getNode, putNode } from './pool';
 const { ccclass, property } = _decorator;
 // 引入 Player，用来读玩家位置
 import { Player } from './Player';
 
 @ccclass('Enemy')
 export class Enemy extends Component {
+    @property({ type: Prefab, tooltip: '经验球预制体' })
+    expPrefab: Prefab = null
+
+
+
     @property({ type: Animation, tooltip: '动画组件' })
     anim: Animation = null
     @property({ tooltip: '待机动画名（Clips 列表里的名字）' })
     idleClip: string = 'bat'
     @property({ tooltip: '死亡动画名' })
     deathClip: string = 'enemy-death'
+
+
+    @property({ tooltip: '生命值' })
+    hp: number = 2
     // 是否处于"正在播死亡动画"的状态
     private _dead = false
     @property({ tooltip: '移动速度（像素/秒）' })
@@ -21,8 +30,6 @@ export class Enemy extends Component {
     //总共击杀了多少敌人（静态，全项目共享）
     static killed: number = 0
 
-    @property({ tooltip: '生命值' })
-    hp: number = 2
     // 当前血量（真正的运行时数值）
     private _hp: number = 0
     // 节点显示时触发（从池里捞出来时也会触发）
@@ -46,6 +53,12 @@ export class Enemy extends Component {
         if (this._dead) return
         this._dead = true
         Enemy.killed++
+        if (this.expPrefab) {
+            const orb = getNode(this.expPrefab)
+            this.node.parent.addChild(orb)
+            orb.setPosition(this.node.position)
+
+        }
         // 尸体不再参与"最近的敌人"和"子弹命中"，否则玩家会对着尸体打
         const i = Enemy.all.indexOf(this)
         if (i >= 0) Enemy.all.splice(i, 1)

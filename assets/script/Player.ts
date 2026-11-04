@@ -6,12 +6,19 @@ import { Enemy } from './Enemy';
 
 @ccclass('Player')
 export class Player extends Component {
+    @property({ tooltip: '等级' })
+    level: number = 1
+    @property({ tooltip: '当前经验' })
+    exp: number = 0
+    @property({ tooltip: '升到下一级需要的经验' })
+    expNeed: number = 5
+
     @property({ type: Prefab, tooltip: '子弹预制体' })
     bulletPrefab: Prefab = null
     @property({ tooltip: '射击间隔（秒）' })
     fireInterval: number = 0.3
     // 射击计时器
-    private _fireTimer: number = 0
+    private _cooldown: number = 0
     // 是否正在按住开火键
     private _firing = false
     @property({ type: Animation, tooltip: '走路帧动画' })
@@ -42,7 +49,6 @@ export class Player extends Component {
             case KeyCode.KEY_J:
                 if (!this._firing) {
                     this._firing = true
-                    this._fireTimer = this.fireInterval
                 } break
 
             case KeyCode.KEY_W: this._dir.y = 1; break
@@ -94,11 +100,11 @@ export class Player extends Component {
         input.off(Input.EventType.KEY_UP, this.onKeyup, this)
     }
 
-       private fire(): void {
-        if (!this.bulletPrefab) return
+    private fire(): boolean {
+        if (!this.bulletPrefab) return false
 
         const target = this.findNearestEnemy()
-        if (!target) return                     // 场上没敌人就不开火
+        if (!target) return false                     // 场上没敌人就不开火
 
         // 方向 = 敌人位置 - 自己位置
         const dir = new Vec3(0, 0, 0)
@@ -113,7 +119,11 @@ export class Player extends Component {
             this.node.position.y + dir.y * 60,
             this.node.position.z
         )
-        bullet.getComponent(Bullet).setDirection(dir)
+
+        const b = bullet.getComponent(Bullet)
+        b.setDirection(dir)
+        b.damage = this.level
+        return true
     }
 
     // 找离自己最近的敌人，没有就返回 null
@@ -145,11 +155,14 @@ export class Player extends Component {
             for (const n of this._pending) putNode(n)
             this._pending.length = 0
         }
-        // 按住开火：每 fireInterval 秒打一发
-        this._fireTimer += dt
-        if (this._firing && this._fireTimer >= this.fireInterval) {
-            this._fireTimer -= this.fireInterval
-            this.fire()
+        // 冷却是"规则的时钟"，不管按没按键，时间都在走
+        if (this._cooldown > 0) this._cooldown -= dt
+
+        // 满足两个条件才能开火：想开火 + 冷却好了
+        if (this._firing && this._cooldown <= 0) {
+            if (this.fire()) {
+                this._cooldown = this.fireInterval
+            }
         }
         if (this._firing) {
             const t = this.findNearestEnemy()
@@ -198,6 +211,23 @@ export class Player extends Component {
         const px = math.clamp(this.node.position.x, -halfMap, halfMap)
         const py = math.clamp(this.node.position.y, -halfMap, halfMap)
         this.node.setPosition(px, py, this.node.position.z);
+
+    }
+    gainExp(n: number) {
+        this.exp += n
+        while (this.exp >= this.expNeed) {
+            // 扣掉这一级要的量
+            this.exp -= this.expNeed
+            // 等级 +1
+            this.level++
+            // 下一级门槛变高 40%
+            this.expNeed = Math.ceil(this.expNeed * 1.4)
+            this.onLevelUp()
+
+        }
+    }
+    onLevelUp() {
+        console.log('升级啦！当前等级', this.level);
 
     }
 

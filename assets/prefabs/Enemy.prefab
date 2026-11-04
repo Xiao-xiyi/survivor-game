@@ -44,7 +44,7 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 703.297,
+      "x": 1004.628,
       "y": 0,
       "z": 0
     },
@@ -85,8 +85,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 136,
-      "height": 90
+      "width": 60,
+      "height": 30
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -127,7 +127,7 @@
     },
     "_type": 0,
     "_fillType": 0,
-    "_sizeMode": 1,
+    "_sizeMode": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
       "x": 0,
@@ -189,13 +189,17 @@
     "__prefab": {
       "__id__": 9
     },
+    "expPrefab": {
+      "__uuid__": "45c43938-8a45-42cc-a4cf-4e18ae456726",
+      "__expectedType__": "cc.Prefab"
+    },
     "anim": {
       "__id__": 6
     },
     "idleClip": "bat",
     "deathClip": "enemy-death",
-    "speed": 100,
     "hp": 2,
+    "speed": 100,
     "_id": ""
   },
   {
@@ -223,9 +227,9 @@
     "_offset": {
       "__type__": "cc.Vec2",
       "x": 0,
-      "y": -7.1
+      "y": -1.3
     },
-    "_radius": 33,
+    "_radius": 11.7,
     "_id": ""
   },
   {
@@ -275,7 +279,6 @@
       "__id__": 0
     },
     "fileId": "4dvJpfkLNE7IiPVsCykYw+",
-    "instance": null,
     "targetOverrides": null
   }
 ]
