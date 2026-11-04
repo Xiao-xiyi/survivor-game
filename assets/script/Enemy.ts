@@ -52,6 +52,8 @@ export class Enemy extends Component {
 
         // 播死亡动画，播完由 onAnimFinished 回池
         this.anim?.play(this.deathClip)
+        // 如果动画组件缺失或动画播不完，0.6 秒后强制回收
+        this.scheduleOnce(() => putNode(this.node), 0.6)
     }
 
     takeDamage(n: number): void {

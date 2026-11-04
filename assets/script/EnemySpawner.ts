@@ -3,7 +3,7 @@ import { _decorator, Component, instantiate, math, Node, Prefab, Vec3 } from 'cc
 import { getNode, putNode } from './pool';
 const { ccclass, property } = _decorator;
 
-@ccclass('NewComponent')
+@ccclass('EnemySpawner')
 export class NewComponent extends Component {
     @property({ type: Prefab, tooltip: '敌人的预制体' })
     enemy: Prefab = null

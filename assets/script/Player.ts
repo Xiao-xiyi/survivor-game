@@ -205,7 +205,6 @@ export class Player extends Component {
         //无敌真没结束就不掉血
         if (this._invincibleTicker > 0) return
         this.hp -= dmg
-        console.log(this.hp);
 
         if (this.hp <= 0) {
             this.die()
