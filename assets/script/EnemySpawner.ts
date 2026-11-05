@@ -1,6 +1,7 @@
 import { _decorator, Component, instantiate, math, Node, Prefab, Vec3 } from 'cc';
 // 从 pool.ts 引入对象池的两个函数
 import { getNode, putNode } from './pool';
+import { GameState } from './GameState';
 const { ccclass, property } = _decorator;
 
 @ccclass('EnemySpawner')
@@ -30,6 +31,7 @@ export class NewComponent extends Component {
         enemy.setWorldPosition(new Vec3(x, y, 0));
     }
     protected update(dt: number): void {
+        if (GameState.over) return       // 游戏结束，别再刷怪
         // 计时器累加这一帧的秒数
         this._timer += dt
         while (this._timer > this.spawnInterval) {

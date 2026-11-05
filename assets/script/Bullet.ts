@@ -1,6 +1,7 @@
 import { _decorator, Component, Node, Vec3 } from 'cc';
 import { putNode } from './pool';
 import { Enemy } from './Enemy';
+import { GameState } from './GameState';
 const { ccclass, property } = _decorator;
 
 @ccclass('Bullet')
@@ -22,6 +23,7 @@ export class Bullet extends Component {
         this.node.angle = Math.atan2(this._dir.y, this._dir.x) * 57.3
     }
     update(dt: number) {
+        if (GameState.over) return       // 游戏结束，子弹停飞
         // 1. 先往前走
         const pos = this.node.position
         this.node.setPosition(
@@ -35,8 +37,8 @@ export class Bullet extends Component {
             const dx = e.node.position.x - this.node.position.x
             const dy = e.node.position.y - this.node.position.y
             if (dx * dx + dy * dy <= r2) {
-                 // 扣血（里面会判断死没死）
-                e.takeDamage(this.damage)  
+                 // 扣血（里面会判断死没死），顺便把飞行方向传过去当击退方向
+                e.takeDamage(this.damage, this._dir)  
                  // 打中了，子弹消失
                 putNode(this.node)         
                 return                      

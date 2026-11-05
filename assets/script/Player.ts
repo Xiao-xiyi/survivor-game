@@ -1,8 +1,10 @@
 import { _decorator, Component, Prefab, EventKeyboard, Animation, Input, input, KeyCode, Node, Vec3, math, Collider2D, Contact2DType } from 'cc';
 const { ccclass, property } = _decorator;
 import { getNode, putNode } from './pool';
+import { UpgradePanel } from './UpgradePanel';
 import { Bullet } from './Bullet';
 import { Enemy } from './Enemy';
+import { GameState } from './GameState';
 
 @ccclass('Player')
 export class Player extends Component {
@@ -17,12 +19,22 @@ export class Player extends Component {
     bulletPrefab: Prefab = null
     @property({ tooltip: '射击间隔（秒）' })
     fireInterval: number = 0.3
+
+
+    @property({ tooltip: '基础伤害' })
+    baseDamage: number = 1
+    @property({ tooltip: '额外伤害（升级加成）' })
+    damageBonus: number = 0
+
+
     // 射击计时器
     private _cooldown: number = 0
     // 是否正在按住开火键
     private _firing = false
     @property({ type: Animation, tooltip: '走路帧动画' })
     walkAnim: Animation = null
+    // 是否已经死了（死了不再响应输入、不再移动）
+    private _dying: boolean = false
     // 记录上一帧是不是在走，用来判断"状态有没有变化"
     private _walking: boolean = false
     // 本帧碰到玩家的敌人，先攒着，等这一帧物理算完再回收
@@ -91,6 +103,7 @@ export class Player extends Component {
         }
         input.on(Input.EventType.KEY_DOWN, this.onKeydown, this)
         input.on(Input.EventType.KEY_UP, this.onKeyup, this)
+        this.walkAnim?.on(Animation.EventType.FINISHED, this.onAnimFinished, this)
     }
     // onDestroy：节点被销毁时调用一次
     protected onDestroy(): void {
@@ -98,6 +111,13 @@ export class Player extends Component {
         if (Player.instance === this) Player.instance = null;
         input.off(Input.EventType.KEY_DOWN, this.onKeydown, this)
         input.off(Input.EventType.KEY_UP, this.onKeyup, this)
+    }
+    private onAnimFinished(): void {
+        if (this._walking) {
+            this.walkAnim?.play('player-move')   
+        } else {
+            this.walkAnim?.stop()                
+        }
     }
 
     private fire(): boolean {
@@ -122,18 +142,19 @@ export class Player extends Component {
 
         const b = bullet.getComponent(Bullet)
         b.setDirection(dir)
-        b.damage = this.level
+        b.damage = this.baseDamage + this.damageBonus
+         this.walkAnim?.play('player-shoot')
         return true
     }
 
     // 找离自己最近的敌人，没有就返回 null
     private findNearestEnemy(): Enemy {
         let best: Enemy = null
-        let bestDist = Infinity                 // 无穷大，第一个敌人肯定比它小
+        let bestDist = Infinity
         for (const e of Enemy.all) {
             const dx = e.node.position.x - this.node.position.x
             const dy = e.node.position.y - this.node.position.y
-            const d = dx * dx + dy * dy         // 平方就够比大小，省开根号
+            const d = dx * dx + dy * dy
             if (d < bestDist) {
                 bestDist = d
                 best = e
@@ -147,6 +168,8 @@ export class Player extends Component {
     }
 
     update(dt: number) {
+        if (this._dying) return         
+      
         if (this._invincibleTicker > 0)
             this._invincibleTicker -= dt;  // 时间递减
 
@@ -227,7 +250,7 @@ export class Player extends Component {
         }
     }
     onLevelUp() {
-        console.log('升级啦！当前等级', this.level);
+        UpgradePanel.instance?.show()
 
     }
 
@@ -246,8 +269,11 @@ export class Player extends Component {
     }
 
     die() {
-        console.log('玩家死亡');
-        this.node.active = false;
+        if (this._dying) return        
+        this._dying = true
+        GameState.over = true   
+         this.walkAnim?.play('player-death')
+          this.scheduleOnce(() => {this.node.active = false }, 0.6)
 
     }
 

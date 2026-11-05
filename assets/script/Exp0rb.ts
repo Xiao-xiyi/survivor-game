@@ -1,6 +1,7 @@
 import { _decorator, Component } from 'cc';
 import { putNode } from './pool';
 import { Player } from './Player';
+import { GameState } from './GameState';
 const { ccclass, property } = _decorator;
 
 @ccclass('ExpOrb')
@@ -12,6 +13,7 @@ export class ExpOrb extends Component {
     @property({ tooltip: '被吸时的飞行速度（像素/秒）' })
     speed: number = 420
     protected update(dt: number): void {
+        if (GameState.over) return        // 游戏结束，经验球不再移动
         const p = Player.instance
         if (!p || !p.node.isValid) return
         const dx = p.node.position.x - this.node.position.x  // x 方向差

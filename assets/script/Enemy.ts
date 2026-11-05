@@ -3,6 +3,9 @@ import { getNode, putNode } from './pool';
 const { ccclass, property } = _decorator;
 // 引入 Player，用来读玩家位置
 import { Player } from './Player';
+// 受击特效（闪红 + 火花 + 顿挫，不闪白）
+import { HitFx } from './HitFx';
+import { GameState } from './GameState';
 
 @ccclass('Enemy')
 export class Enemy extends Component {
@@ -32,6 +35,8 @@ export class Enemy extends Component {
 
     // 当前血量（真正的运行时数值）
     private _hp: number = 0
+    // 受击特效组件（onLoad 里自动挂上，不用改预制体）
+    private fx: HitFx = null
     // 节点显示时触发（从池里捞出来时也会触发）
     protected onEnable(): void {
         // ⚠️ 从池里捞出来的节点，血必须重置
@@ -44,6 +49,7 @@ export class Enemy extends Component {
     protected onDisable(): void {
         const i = Enemy.all.indexOf(this)   // 找不到返回 -1
         if (i >= 0) Enemy.all.splice(i, 1)  // 找到了就从名单里删掉
+        this.fx?.stop()                     // 回池时把闪色/缩放/击退清干净，否则下次复用会带脏状态
     }
     private _dir = new Vec3(0, 0, 0);
 
@@ -53,6 +59,7 @@ export class Enemy extends Component {
         if (this._dead) return
         this._dead = true
         Enemy.killed++
+        this.fx?.stop()          // 死亡时先收掉受击特效，免得红色剪影盖在尸体动画上
         if (this.expPrefab) {
             const orb = getNode(this.expPrefab)
             this.node.parent.addChild(orb)
@@ -69,14 +76,20 @@ export class Enemy extends Component {
         this.scheduleOnce(() => putNode(this.node), 0.6)
     }
 
-    takeDamage(n: number): void {
+    takeDamage(n: number, dir?: Vec3): void {
         if (this._dead) return   // 尸体不再掉血
         this._hp -= n
-        if (this._hp <= 0) this.die()
+        if (this._hp <= 0) {     // 这一下打死了，直接播死亡动画，不再弹受击特效
+            this.die()
+            return
+        }
+        // 还活着 -> 播受击特效（dir 是子弹方向，用来击退）
+        this.fx?.play(dir)
     }
 
     update(dt: number) {
         if (this._dead) return   // 死亡动画播放期间不再追玩家
+        if (GameState.over) return   // 游戏结束，敌人停下
         const player = Player.instance
         if (!player || !player.node || !player.node.isValid) return;
         // 算出从自己指向玩家的方向：目标位置 - 自己的位置
@@ -100,6 +113,9 @@ export class Enemy extends Component {
         if (!this.anim) this.anim = this.getComponent(Animation)
         // 动画播完会发这个事件，我们在里面判断是不是死亡动画
         this.anim?.on(Animation.EventType.FINISHED, this.onAnimFinished, this)
+        // 受击特效：预制体上没挂就自动加一个，省得手动改 Enemy.prefab
+        this.fx = this.getComponent(HitFx)
+        if (!this.fx) this.fx = this.addComponent(HitFx)
     }
 
     // 动画播放结束

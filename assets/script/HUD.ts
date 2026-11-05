@@ -2,6 +2,7 @@ import { _decorator, Component, director, EventKeyboard, Input, input, KeyCode, 
 import { Player } from './Player';
 import { Enemy } from './Enemy';
 import { clearPool } from './pool';
+import { GameState } from './GameState';
 const { ccclass, property } = _decorator;
 
 @ccclass('HUD')
@@ -40,6 +41,7 @@ export class HUD extends Component {
     protected onLoad() {
         Enemy.killed = 0
         Enemy.all.length = 0
+        GameState.over = false           // 静态变量，重开一局必须手动复位
         clearPool()
         if (this.gameOverPanel) {
             this.gameOverPanel.active = false
