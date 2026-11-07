@@ -24,7 +24,9 @@ export function putNode(node: Node): void {
     //确认这个预制体在_map的对应数组里如果没有就添加进去
     if (!_map.has(name)) _map.set(name, [])
     //把节点放进对象池里
-    _map.get(name)!.push(node)
+    const arr = _map.get(name)!
+    if (arr.includes(node)) return   // 已经在池子里了，别重复放
+    arr.push(node)
 
 }
 //场景切换时清空对象池

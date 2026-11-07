@@ -1,11 +1,11 @@
-import { _decorator, Component, instantiate, math, Node, Prefab, Vec3 } from 'cc';
-// 从 pool.ts 引入对象池的两个函数
-import { getNode, putNode } from './pool';
+import { _decorator, Component, math, Prefab, Vec3 } from 'cc';
+// 从 pool.ts 引入对象池的取出函数
+import { getNode } from './pool';
 import { GameState } from './GameState';
 const { ccclass, property } = _decorator;
 
 @ccclass('EnemySpawner')
-export class NewComponent extends Component {
+export class EnemySpawner extends Component {
     @property({ type: Prefab, tooltip: '敌人的预制体' })
     enemy: Prefab = null
     @property({ tooltip: '生成间隔' })
@@ -32,10 +32,11 @@ export class NewComponent extends Component {
     }
     protected update(dt: number): void {
         if (GameState.over) return       // 游戏结束，别再刷怪
+        const cur = Math.max(0.45, this.spawnInterval - GameState.time * 0.02)
         // 计时器累加这一帧的秒数
         this._timer += dt
-        while (this._timer > this.spawnInterval) {
-            this._timer -= this.spawnInterval
+        while (this._timer > cur) {
+            this._timer -= cur
             //生成一个敌人
             this.spawOne()
         }

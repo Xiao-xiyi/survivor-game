@@ -1,4 +1,4 @@
-import { _decorator, Component, Prefab, Node, Animation, Vec3 } from 'cc';
+import { _decorator, Component, Prefab, Animation, Vec3 } from 'cc';
 import { getNode, putNode } from './pool';
 const { ccclass, property } = _decorator;
 // 引入 Player，用来读玩家位置
@@ -41,7 +41,7 @@ export class Enemy extends Component {
     protected onEnable(): void {
         // ⚠️ 从池里捞出来的节点，血必须重置
         Enemy.all.push(this)     // 加入名单
-        this._hp = this.hp
+        this._hp = this.hp + Math.floor(GameState.time / 45)
         this._dead = false       // ⚠️ 死亡标记也要重置
         this.anim?.play(this.idleClip)   // 复活后先播待机      
     }

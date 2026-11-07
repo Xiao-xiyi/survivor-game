@@ -40,6 +40,7 @@ export class HUD extends Component {
 
     protected onLoad() {
         Enemy.killed = 0
+        GameState.time = 0
         Enemy.all.length = 0
         GameState.over = false           // 静态变量，重开一局必须手动复位
         clearPool()
@@ -57,6 +58,7 @@ export class HUD extends Component {
         if (this._over) return
         // 计时
         this._time += dt
+        GameState.time += dt
         const sec = Math.floor(this._time)
         // 只在秒数变化时才改 Label，不然每秒改 60 次纯属浪费
         if (sec !== this._shownSec) {

@@ -199,7 +199,7 @@
     "idleClip": "bat",
     "deathClip": "enemy-death",
     "hp": 2,
-    "speed": 100,
+    "speed": 140,
     "_id": ""
   },
   {
@@ -279,6 +279,7 @@
       "__id__": 0
     },
     "fileId": "4dvJpfkLNE7IiPVsCykYw+",
+    "instance": null,
     "targetOverrides": null
   }
 ]

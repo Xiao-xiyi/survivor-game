@@ -1,4 +1,4 @@
-import { _decorator, Component, director, EventKeyboard, Input, input, KeyCode, Label, log, Node } from 'cc';
+import { _decorator, Component, director, EventKeyboard, Input, input, KeyCode, Label, Node } from 'cc';
 const { ccclass, property } = _decorator;
 import { Player } from './Player';
 
@@ -39,9 +39,9 @@ export class UpgradePanel extends Component {
         if (this.optionLabel) {
             this.optionLabel.string =
                 `升级！选择一项强化\n\n` +
-                `1. 伤害+1      (当前${p.baseDamage + p.damageBonus})\n` +
-                `2. 攻速 +25%     （当前 ${(1 / p.fireInterval).toFixed(1)} 发/秒）\n` +
-                `3. 移速 +15%     （当前 ${p.speed} 像素/秒）`
+                `1. 伤害+0.5    (当前${p.baseDamage + p.damageBonus})\n` +
+                `2. 攻速 +11%    (当前 ${(1 / p.fireInterval).toFixed(1)} 发/秒)\n` +
+                `3. 移速 +5%     (当前 ${p.speed} 像素/秒)`
         }
         if (this.panel)
             this.panel.active = true
@@ -61,9 +61,9 @@ export class UpgradePanel extends Component {
         const p = Player.instance
         if (!p) return
         switch (i) {
-            case 0: p.damageBonus += 1;break
-            case 1: p.fireInterval = Math.max(0.08, p.fireInterval * 0.75);break
-            case 2: p.speed *= 1.15;break
+            case 0: p.damageBonus += 0.5;break
+            case 1: p.fireInterval = Math.max(0.12, p.fireInterval * 0.90);break
+            case 2: p.speed *= 1.05;break
 
         }
         // 关面板

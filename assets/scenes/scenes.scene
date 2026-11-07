@@ -371,6 +371,9 @@
     },
     "_enabled": true,
     "__prefab": null,
+    "cam": {
+      "__id__": 4
+    },
     "level": 1,
     "exp": 0,
     "expNeed": 5,
@@ -378,7 +381,7 @@
       "__uuid__": "ade191f5-8f6c-4417-8dce-1149f1c1a72a",
       "__expectedType__": "cc.Prefab"
     },
-    "fireInterval": 0.5,
+    "fireInterval": 0.45,
     "baseDamage": 1,
     "damageBonus": 0,
     "walkAnim": {
@@ -388,7 +391,7 @@
     "maxHp": 5,
     "invincibleTime": 1,
     "_invincibleTicker": 0,
-    "speed": 500,
+    "speed": 400,
     "_id": "dejVXnIs9Gr4XeyTghfbyI"
   },
   {
@@ -1015,7 +1018,7 @@
       "__uuid__": "e736cbb8-ee69-4b00-a433-6fd0264d9b07",
       "__expectedType__": "cc.Prefab"
     },
-    "spawnInterval": 0.1,
+    "spawnInterval": 1.8,
     "spawnRadius": 2100,
     "_id": "ca/BtvWEpO5q4wmIZ7T0L4"
   },

@@ -1,4 +1,4 @@
-import { _decorator, Component, Prefab, EventKeyboard, Animation, Input, input, KeyCode, Node, Vec3, math, Collider2D, Contact2DType } from 'cc';
+import { _decorator, Component, Prefab, EventKeyboard, Animation, Input, input, KeyCode, Node, Vec3, math, Collider2D, Contact2DType, Camera, view } from 'cc';
 const { ccclass, property } = _decorator;
 import { getNode, putNode } from './pool';
 import { UpgradePanel } from './UpgradePanel';
@@ -8,6 +8,11 @@ import { GameState } from './GameState';
 
 @ccclass('Player')
 export class Player extends Component {
+    @property({ type: Camera, tooltip: '主相机，用来算可视范围' })
+    cam: Camera = null
+    private _aimRange = 750    // onLoad 里算一次存起来，别每帧开根号
+
+
     @property({ tooltip: '等级' })
     level: number = 1
     @property({ tooltip: '当前经验' })
@@ -92,6 +97,14 @@ export class Player extends Component {
     }
     // onLoad：节点加载完成时调用一次，用来做初始化
     protected onLoad(): void {
+        if (this.cam) {
+            const halfH = this.cam.orthoHeight                          // 360
+            const size = view.getVisibleSize()                          // 实际窗口
+            const halfW = halfH * size.width / size.height              // 按窗口比例算半宽
+            this._aimRange = Math.sqrt(halfH * halfH + halfW * halfW)   // 到屏幕角落的距离
+        }
+        // cam 没拖的话沿用兜底值 750
+
 
         // 把自己存进静态变量
         Player.instance = this;
@@ -111,12 +124,13 @@ export class Player extends Component {
         if (Player.instance === this) Player.instance = null;
         input.off(Input.EventType.KEY_DOWN, this.onKeydown, this)
         input.off(Input.EventType.KEY_UP, this.onKeyup, this)
+        this.walkAnim?.off(Animation.EventType.FINISHED, this.onAnimFinished, this)  // 与 onLoad 里的 on 成对
     }
     private onAnimFinished(): void {
         if (this._walking) {
-            this.walkAnim?.play('player-move')   
+            this.walkAnim?.play('player-move')
         } else {
-            this.walkAnim?.stop()                
+            this.walkAnim?.stop()
         }
     }
 
@@ -143,14 +157,15 @@ export class Player extends Component {
         const b = bullet.getComponent(Bullet)
         b.setDirection(dir)
         b.damage = this.baseDamage + this.damageBonus
-         this.walkAnim?.play('player-shoot')
+        this.walkAnim?.play('player-shoot')
         return true
     }
 
     // 找离自己最近的敌人，没有就返回 null
     private findNearestEnemy(): Enemy {
+        const MAX_RANGE = this._aimRange
         let best: Enemy = null
-        let bestDist = Infinity
+        let bestDist = MAX_RANGE * MAX_RANGE
         for (const e of Enemy.all) {
             const dx = e.node.position.x - this.node.position.x
             const dy = e.node.position.y - this.node.position.y
@@ -163,13 +178,16 @@ export class Player extends Component {
         return best
     }
 
+
+
+
     start() {
 
     }
 
     update(dt: number) {
-        if (this._dying) return         
-      
+        if (this._dying) return
+
         if (this._invincibleTicker > 0)
             this._invincibleTicker -= dt;  // 时间递减
 
@@ -269,11 +287,11 @@ export class Player extends Component {
     }
 
     die() {
-        if (this._dying) return        
+        if (this._dying) return
         this._dying = true
-        GameState.over = true   
-         this.walkAnim?.play('player-death')
-          this.scheduleOnce(() => {this.node.active = false }, 0.6)
+        GameState.over = true
+        this.walkAnim?.play('player-death')
+        this.scheduleOnce(() => { this.node.active = false }, 0.6)
 
     }
 

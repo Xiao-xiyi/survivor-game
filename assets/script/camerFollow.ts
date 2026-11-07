@@ -6,7 +6,7 @@ export class camerFollow extends Component {
    
     @property({ type: Node, tooltip: '要跟随的目标节点' })
     target: Node = null
-    protected lateUpdate(dt: number): void {
+    protected update(dt: number): void {
         
         // 如果没设目标，或者目标已销毁，就不动
         if (!this.target || !this.target.isValid) return
