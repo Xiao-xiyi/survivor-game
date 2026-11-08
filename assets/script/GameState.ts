@@ -2,5 +2,6 @@
 export const GameState = {
     // 游戏是否结束；true 时敌人、子弹、经验球全部停摆
     over: false,
-    time: 0
+    time: 0,
+    started: false
 }

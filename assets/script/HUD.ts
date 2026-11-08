@@ -1,9 +1,10 @@
-import { _decorator, Component, director, EventKeyboard, Input, input, KeyCode, Label, Node, Sprite } from 'cc';
+import { _decorator, Component,sys, director, EventKeyboard, Input, input, KeyCode, Label, Node, Sprite } from 'cc';
 import { Player } from './Player';
 import { Enemy } from './Enemy';
 import { clearPool } from './pool';
 import { GameState } from './GameState';
 import { AudioMgr } from './AudioMgr';
+import { StartPanel } from './Startpanel';
 const { ccclass, property } = _decorator;
 
 @ccclass('HUD')
@@ -56,6 +57,7 @@ export class HUD extends Component {
 
 
     update(dt: number) {
+        if (!GameState.started) return  
         if (this._over) return
         // 计时
         this._time += dt
@@ -79,10 +81,17 @@ export class HUD extends Component {
         // 血量为 0 → 弹出结算
         if (p.hp <= 0) this.showGameOver()
     }
-    showGameOver() {
+      showGameOver() {
         this._over = true
+        const sec = Math.floor(this._time)
+        console.log('[HUD] 调用 saveBest, instance =', StartPanel.instance, ' sec =', sec)
+        // 结算时最高分（写存档 + 更新菜单文字）
+        StartPanel.instance?.saveBest(sec)
+        // 结算面板自己要显示最高纪录：读回存档，两者取大
+        const stored = Number(sys.localStorage.getItem('survival_best') ?? 0)
+        const best = Math.max(sec, stored)
         if (this.resultLabel) {
-            this.resultLabel.string = `存活 ${Math.floor(this._time)} 秒\n击杀 ${Enemy.killed}`
+            this.resultLabel.string = `存活 ${sec} 秒\n最高纪录 ${best} 秒\n击杀 ${Enemy.killed}`
         }
         if (this.gameOverPanel) {
             this.gameOverPanel.active = true

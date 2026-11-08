@@ -188,6 +188,7 @@ export class Player extends Component {
     }
 
     update(dt: number) {
+        if (!GameState.started) return  
         if (this._dying) return
 
         if (this._invincibleTicker > 0)
