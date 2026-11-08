@@ -1,4 +1,4 @@
-import { _decorator, Component,sys, director, EventKeyboard, Input, input, KeyCode, Label, Node, Sprite } from 'cc';
+import { _decorator, Component, sys, director, EventKeyboard, Input, input, KeyCode, Label, Node, Sprite } from 'cc';
 import { Player } from './Player';
 import { Enemy } from './Enemy';
 import { clearPool } from './pool';
@@ -20,7 +20,8 @@ export class HUD extends Component {
     @property({ type: Label, tooltip: '存活时间' })
     timeLabel: Label = null
 
-
+    @property({ type: Node, tooltip: '暂停面板（平时关着）' })
+    pausePanel: Node = null
 
     @property({ type: Node, tooltip: '结算面板（平时关着）' })
     gameOverPanel: Node = null
@@ -34,6 +35,14 @@ export class HUD extends Component {
 
 
     onKeyDown(e: EventKeyboard) {
+        if (e.keyCode === KeyCode.ESCAPE) {
+            if (!GameState.started || this._over) return   // 菜单和结算界面不响应
+            GameState.paused = !GameState.paused
+            if (this.pausePanel) this.pausePanel.active = GameState.paused
+            return
+        }
+
+
         if (!this._over) return
         if (e.keyCode === KeyCode.KEY_R) {
             director.loadScene('scenes')
@@ -46,6 +55,9 @@ export class HUD extends Component {
         Enemy.all.length = 0
         GameState.over = false           // 静态变量，重开一局必须手动复位
         clearPool()
+        if (this.pausePanel) {
+            this.pausePanel.active = false
+        }
         if (this.gameOverPanel) {
             this.gameOverPanel.active = false
         }
@@ -57,11 +69,13 @@ export class HUD extends Component {
 
 
     update(dt: number) {
-        if (!GameState.started) return  
+        if (!GameState.started) return
         if (this._over) return
-        // 计时
-        this._time += dt
-        GameState.time += dt
+        // 暂停时不走表，否则暂停 10 秒再继续，存活时间凭空多 10 秒
+        if (!GameState.paused) {
+            this._time += dt
+            GameState.time += dt
+        }
         const sec = Math.floor(this._time)
         // 只在秒数变化时才改 Label，不然每秒改 60 次纯属浪费
         if (sec !== this._shownSec) {
@@ -81,10 +95,9 @@ export class HUD extends Component {
         // 血量为 0 → 弹出结算
         if (p.hp <= 0) this.showGameOver()
     }
-      showGameOver() {
+    showGameOver() {
         this._over = true
         const sec = Math.floor(this._time)
-        console.log('[HUD] 调用 saveBest, instance =', StartPanel.instance, ' sec =', sec)
         // 结算时最高分（写存档 + 更新菜单文字）
         StartPanel.instance?.saveBest(sec)
         // 结算面板自己要显示最高纪录：读回存档，两者取大

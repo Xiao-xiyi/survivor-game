@@ -31,6 +31,7 @@ export class EnemySpawner extends Component {
         enemy.setWorldPosition(new Vec3(x, y, 0));
     }
     protected update(dt: number): void {
+        if (GameState.paused) return 
         if (!GameState.started) return  
         if (GameState.over) return       // 游戏结束，别再刷怪
         const cur = Math.max(0.45, this.spawnInterval - GameState.time * 0.02)

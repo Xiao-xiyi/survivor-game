@@ -107,6 +107,7 @@ export class Enemy extends Component {
     }
 
     update(dt: number) {
+        if (GameState.paused) return 
         if (!GameState.started) return  
         if (this._dead) return   // 死亡动画播放期间不再追玩家
         if (GameState.over) return   // 游戏结束，敌人停下

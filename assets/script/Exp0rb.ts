@@ -13,6 +13,7 @@ export class ExpOrb extends Component {
     @property({ tooltip: '被吸时的飞行速度（像素/秒）' })
     speed: number = 420
     protected update(dt: number): void {
+        if (GameState.paused) return 
         if (GameState.over) return        // 游戏结束，经验球不再移动
         const p = Player.instance
         if (!p || !p.node.isValid) return

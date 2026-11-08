@@ -23,6 +23,7 @@ export class Bullet extends Component {
         this.node.angle = Math.atan2(this._dir.y, this._dir.x) * 57.3
     }
     update(dt: number) {
+        if (GameState.paused) return 
         if (GameState.over) return       // 游戏结束，子弹停飞
         // 1. 先往前走
         const pos = this.node.position
