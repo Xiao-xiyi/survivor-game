@@ -43,7 +43,7 @@ canvas {
   height: 100%;
 }
 
-/* 窗口比例和 16:9 不一致时，保持画面比例（留黑边），不要拉扁 */
+/* 窗口比例�?16:9 不一致时，保持画面比例（留黑边），不要拉�?*/
 #GameCanvas {
   display: block;
   object-fit: contain;

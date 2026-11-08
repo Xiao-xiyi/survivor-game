@@ -16,23 +16,18 @@ if (-not (Test-Path 'build\web-desktop\index.html')) {
 }
 
 # 1. 备份 3 个"手工定制"文件（构建产物里没有它们/会被覆盖）
-$tmpBase = if ($env:TEMP) { $env:TEMP } else { $PSScriptRoot }
-$tmp = Join-Path $tmpBase 'deploy-keep'
-Remove-Item $tmp -Recurse -Force -ErrorAction SilentlyContinue
-New-Item $tmp -ItemType Directory | Out-Null
-foreach ($f in 'index.html','style.css','.nojekyll') {
-    if (Test-Path "docs\$f") { Copy-Item "docs\$f" "$tmp\$f" -Force }
-}
+$keepHtml  = if (Test-Path 'docs\index.html')  { Get-Content 'docs\index.html' -Raw } else { $null }
+$keepCss   = if (Test-Path 'docs\style.css')   { Get-Content 'docs\style.css'  -Raw } else { $null }
+$hadJekyll = Test-Path 'docs\.nojekyll'
 
 # 2. 把构建产物整目录镜像进 docs（多出来的删掉，改动的覆盖）
 robocopy 'build\web-desktop' 'docs' /MIR /NFL /NDL /NJH /NP
 if ($LASTEXITCODE -ge 8) { Write-Host "X robocopy 失败 code=$LASTEXITCODE" -ForegroundColor Red; exit 1 }
 
 # 3. 还原定制文件
-foreach ($f in 'index.html','style.css','.nojekyll') {
-    if (Test-Path "$tmp\$f") { Copy-Item "$tmp\$f" "docs\$f" -Force }
-}
-Remove-Item $tmp -Recurse -Force -ErrorAction SilentlyContinue
+if ($keepHtml  -ne $null) { Set-Content -Path 'docs\index.html' -Value $keepHtml  -NoNewline }
+if ($keepCss   -ne $null) { Set-Content -Path 'docs\style.css'  -Value $keepCss   -NoNewline }
+if ($hadJekyll)           { New-Item -Path 'docs\.nojekyll' -ItemType File -Force | Out-Null }
 
 # 4. settings.json 每次构建都会把 exactFitScreen 重置成 false，重新打开
 $sp = 'docs\src\settings.json'
