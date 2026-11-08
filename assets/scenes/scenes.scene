@@ -1130,7 +1130,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": 0,
+      "y": -300,
       "z": 0
     },
     "_lrot": {
@@ -1216,7 +1216,7 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 120,
+      "width": 1200,
       "height": 20
     },
     "_anchorPoint": {
@@ -1277,7 +1277,7 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 120,
+      "width": 1200,
       "height": 20
     },
     "_anchorPoint": {
@@ -1389,7 +1389,7 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 36.4609375,
+      "width": 36.45687577736318,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -1422,7 +1422,7 @@
     "_string": "label",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 16,
+    "_actualFontSize": 22.6125,
     "_fontSize": 16,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1473,7 +1473,7 @@
     "__prefab": null,
     "_alignFlags": 9,
     "_target": null,
-    "_left": 59.99796913868159,
+    "_left": 60,
     "_right": 0,
     "_top": 0,
     "_bottom": 0,
@@ -1554,7 +1554,7 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 36.4609375,
+      "width": 36.45687577736318,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -1587,7 +1587,7 @@
     "_string": "label",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 16,
+    "_actualFontSize": 22.6125,
     "_fontSize": 16,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1669,7 +1669,7 @@
         "__id__": 45
       }
     ],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 57
@@ -2264,7 +2264,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": -290,
+      "y": -275,
       "z": 0
     },
     "_lrot": {
@@ -2302,7 +2302,7 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 63.806640625,
+      "width": 63.80359487285793,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -2335,7 +2335,7 @@
     "_string": "label",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 28,
+    "_actualFontSize": 39.571875,
     "_fontSize": 28,
     "_fontFamily": "Arial",
     "_lineHeight": 40,

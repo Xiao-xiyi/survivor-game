@@ -43,6 +43,12 @@ canvas {
   height: 100%;
 }
 
+/* 窗口比例和 16:9 不一致时，保持画面比例（留黑边），不要拉扁 */
+#GameCanvas {
+  display: block;
+  object-fit: contain;
+}
+
 :root {
   --safe-top: env(safe-area-inset-top);
   --safe-right: env(safe-area-inset-right);
