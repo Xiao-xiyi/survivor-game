@@ -193,6 +193,10 @@
       "__uuid__": "45c43938-8a45-42cc-a4cf-4e18ae456726",
       "__expectedType__": "cc.Prefab"
     },
+    "dmgPrefab": {
+      "__uuid__": "4aebff7b-f768-4090-84ef-9f6b2b3cc309",
+      "__expectedType__": "cc.Prefab"
+    },
     "anim": {
       "__id__": 6
     },

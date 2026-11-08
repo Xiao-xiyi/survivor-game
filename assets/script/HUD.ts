@@ -3,6 +3,7 @@ import { Player } from './Player';
 import { Enemy } from './Enemy';
 import { clearPool } from './pool';
 import { GameState } from './GameState';
+import { AudioMgr } from './AudioMgr';
 const { ccclass, property } = _decorator;
 
 @ccclass('HUD')

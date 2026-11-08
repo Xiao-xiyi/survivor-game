@@ -1,17 +1,21 @@
-import { _decorator, Component, Prefab, Animation, Vec3 } from 'cc';
+import { _decorator, Component, Collider2D, Prefab, Animation, Vec3 } from 'cc';
 import { getNode, putNode } from './pool';
 const { ccclass, property } = _decorator;
 // 引入 Player，用来读玩家位置
 import { Player } from './Player';
 // 受击特效（闪红 + 火花 + 顿挫，不闪白）
 import { HitFx } from './HitFx';
+// 音效
+import { AudioMgr } from './AudioMgr';
+import { Dmgpopup } from './Dmgpopup'
 import { GameState } from './GameState';
 
 @ccclass('Enemy')
 export class Enemy extends Component {
     @property({ type: Prefab, tooltip: '经验球预制体' })
     expPrefab: Prefab = null
-
+    @property({ type: Prefab, tooltip: '飘字预制体' })
+    dmgPrefab: Prefab = null
 
 
     @property({ type: Animation, tooltip: '动画组件' })
@@ -43,6 +47,8 @@ export class Enemy extends Component {
         Enemy.all.push(this)     // 加入名单
         this._hp = this.hp + Math.floor(GameState.time / 45)
         this._dead = false       // ⚠️ 死亡标记也要重置
+        const col = this.getComponent(Collider2D)
+        if (col) col.enabled = true
         this.anim?.play(this.idleClip)   // 复活后先播待机      
     }
     // 节点隐藏时触发（被 putNode 回收时也会触发）
@@ -72,6 +78,12 @@ export class Enemy extends Component {
 
         // 播死亡动画，播完由 onAnimFinished 回池
         this.anim?.play(this.deathClip)
+        // 尸体不该再撞人：关掉碰撞体（延迟一帧，避免在物理回调里改刚体触发引擎警告）
+        this.scheduleOnce(() => {
+            const col = this.getComponent(Collider2D)
+            if (col) col.enabled = false
+        }, 0)
+        AudioMgr.instance?.playEnemyDie()
         // 如果动画组件缺失或动画播不完，0.6 秒后强制回收
         this.scheduleOnce(() => putNode(this.node), 0.6)
     }
@@ -79,12 +91,19 @@ export class Enemy extends Component {
     takeDamage(n: number, dir?: Vec3): void {
         if (this._dead) return   // 尸体不再掉血
         this._hp -= n
+        // 飘字：与敌人挂同一层（同层才能直接用敌人的坐标），弹在头顶上方
+        if (this.dmgPrefab) {
+            const p = getNode(this.dmgPrefab)
+            p.setParent(this.node.parent)
+            p.getComponent(Dmgpopup)?.init(n, this.node.position.x, this.node.position.y + 40)
+        }
         if (this._hp <= 0) {     // 这一下打死了，直接播死亡动画，不再弹受击特效
             this.die()
             return
         }
         // 还活着 -> 播受击特效（dir 是子弹方向，用来击退）
         this.fx?.play(dir)
+
     }
 
     update(dt: number) {
@@ -109,6 +128,7 @@ export class Enemy extends Component {
         )
     }
     protected onLoad(): void {
+
         // 没在编辑器里拖的话，自动取身上的 Animation 组件
         if (!this.anim) this.anim = this.getComponent(Animation)
         // 动画播完会发这个事件，我们在里面判断是不是死亡动画

@@ -1,6 +1,7 @@
 import { _decorator, Component, director, EventKeyboard, Input, input, KeyCode, Label, Node } from 'cc';
 const { ccclass, property } = _decorator;
 import { Player } from './Player';
+import { AudioMgr } from './AudioMgr';
 
 @ccclass('UpgradePanel')
 export class UpgradePanel extends Component {
@@ -16,9 +17,9 @@ export class UpgradePanel extends Component {
 
 
     protected onLoad(): void {
-        UpgradePanel.instance = this                  
-        if (this.panel) this.panel.active = false    
-        input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this)  
+        UpgradePanel.instance = this
+        if (this.panel) this.panel.active = false
+        input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this)
     }
 
     protected onDestroy(): void {
@@ -51,9 +52,9 @@ export class UpgradePanel extends Component {
     private onKeyDown(e: EventKeyboard): void {
         if (!this._showing) return
         switch (e.keyCode) {
-            case KeyCode.DIGIT_1: this.apply(0);break
-            case KeyCode.DIGIT_2: this.apply(1);break
-            case KeyCode.DIGIT_3: this.apply(2);break
+            case KeyCode.DIGIT_1: this.apply(0); break
+            case KeyCode.DIGIT_2: this.apply(1); break
+            case KeyCode.DIGIT_3: this.apply(2); break
         }
 
     }
@@ -61,14 +62,15 @@ export class UpgradePanel extends Component {
         const p = Player.instance
         if (!p) return
         switch (i) {
-            case 0: p.damageBonus += 0.5;break
-            case 1: p.fireInterval = Math.max(0.12, p.fireInterval * 0.90);break
-            case 2: p.speed *= 1.05;break
+            case 0: p.damageBonus += 0.5; break
+            case 1: p.fireInterval = Math.max(0.12, p.fireInterval * 0.90); break
+            case 2: p.speed *= 1.05; break
 
         }
         // 关面板
         if (this.panel) this.panel.active = false
         this._showing = false
+        AudioMgr.instance?.playLevelUp()
         director.resume()
 
     }

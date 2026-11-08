@@ -5,6 +5,7 @@ import { UpgradePanel } from './UpgradePanel';
 import { Bullet } from './Bullet';
 import { Enemy } from './Enemy';
 import { GameState } from './GameState';
+import { AudioMgr } from './AudioMgr';
 
 @ccclass('Player')
 export class Player extends Component {
@@ -158,6 +159,7 @@ export class Player extends Component {
         b.setDirection(dir)
         b.damage = this.baseDamage + this.damageBonus
         this.walkAnim?.play('player-shoot')
+        AudioMgr.instance?.playShoot()     // 真开火了才响
         return true
     }
 
@@ -268,6 +270,7 @@ export class Player extends Component {
         }
     }
     onLevelUp() {
+
         UpgradePanel.instance?.show()
 
     }
@@ -276,7 +279,7 @@ export class Player extends Component {
         //无敌真没结束就不掉血
         if (this._invincibleTicker > 0) return
         this.hp -= dmg
-
+        AudioMgr.instance?.playHurt()
         if (this.hp <= 0) {
             this.die()
             return
@@ -290,6 +293,8 @@ export class Player extends Component {
         if (this._dying) return
         this._dying = true
         GameState.over = true
+         // 死亡时音乐停掉
+        AudioMgr.instance?.stopBgm()   
         this.walkAnim?.play('player-death')
         this.scheduleOnce(() => { this.node.active = false }, 0.6)
 
