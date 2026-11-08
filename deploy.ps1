@@ -15,19 +15,22 @@ if (-not (Test-Path 'build\web-desktop\index.html')) {
     exit 1
 }
 
-# 1. 备份 3 个"手工定制"文件（构建产物里没有它们/会被覆盖）
-$keepHtml  = if (Test-Path 'docs\index.html')  { Get-Content 'docs\index.html' -Raw } else { $null }
-$keepCss   = if (Test-Path 'docs\style.css')   { Get-Content 'docs\style.css'  -Raw } else { $null }
-$hadJekyll = Test-Path 'docs\.nojekyll'
+# 1. 确认定制模板在（web\ 下是唯一正本，不从 docs 备份，避免把被覆盖的模板再还原回去）
+foreach ($f in 'web\index.html', 'web\style.css') {
+    if (-not (Test-Path $f)) {
+        Write-Host "X 缺少定制模板 $f，请先把它补回来！" -ForegroundColor Red
+        exit 1
+    }
+}
 
 # 2. 把构建产物整目录镜像进 docs（多出来的删掉，改动的覆盖）
 robocopy 'build\web-desktop' 'docs' /MIR /NFL /NDL /NJH /NP
 if ($LASTEXITCODE -ge 8) { Write-Host "X robocopy 失败 code=$LASTEXITCODE" -ForegroundColor Red; exit 1 }
 
-# 3. 还原定制文件
-if ($keepHtml  -ne $null) { Set-Content -Path 'docs\index.html' -Value $keepHtml  -NoNewline }
-if ($keepCss   -ne $null) { Set-Content -Path 'docs\style.css'  -Value $keepCss   -NoNewline }
-if ($hadJekyll)           { New-Item -Path 'docs\.nojekyll' -ItemType File -Force | Out-Null }
+# 3. 用仓库里的定制模板覆盖回 docs
+Copy-Item 'web\index.html' 'docs\index.html' -Force
+Copy-Item 'web\style.css'  'docs\style.css'  -Force
+New-Item -Path 'docs\.nojekyll' -ItemType File -Force | Out-Null
 
 # 4. settings.json 每次构建都会把 exactFitScreen 重置成 false，重新打开
 $sp = 'docs\src\settings.json'
