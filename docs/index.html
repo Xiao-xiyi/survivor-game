@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 
-    <title>幸存者 survivor-game</title>
+    <title>骞稿瓨鑰?survivor-game</title>
 
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1,minimal-ui=true"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -32,10 +32,11 @@
 <script src="src/system.bundle.js" charset="utf-8"> </script>
 
 <!-- Import map -->
-<script src="src/import-map.json" type="systemjs-importmap" charset="utf-8"> </script>
+<!-- 202611102318 鐢?deploy.ps1 鏇挎崲鎴愰儴缃叉椂闂存埑锛屽己鍒舵祻瑙堝櫒閲嶆柊涓嬭浇锛岄伩鍏嶈鍒?10 鍒嗛挓缂撳瓨鐨勬棫鍖?-->
+<script src="src/import-map.json?v=202611102318" type="systemjs-importmap" charset="utf-8"> </script>
 
 <script>
-    System.import('./index.js').catch(function(err) { console.error(err); })
+    System.import('./index.js?v=202611102318').catch(function(err) { console.error(err); })
 </script>
   </body>
 </html>

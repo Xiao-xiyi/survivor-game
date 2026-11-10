@@ -27,8 +27,11 @@ foreach ($f in 'web\index.html', 'web\style.css') {
 robocopy 'build\web-desktop' 'docs' /MIR /NFL /NDL /NJH /NP
 if ($LASTEXITCODE -ge 8) { Write-Host "X robocopy 失败 code=$LASTEXITCODE" -ForegroundColor Red; exit 1 }
 
-# 3. 用仓库里的定制模板覆盖回 docs
-Copy-Item 'web\index.html' 'docs\index.html' -Force
+# 3. 用仓库里的定制模板生成 docs/index.html，并把 __BUILD__ 换成当前时间戳
+#    （index.js 文件名固定，浏览器会缓存 10 分钟；带版本号能强制重新下载）
+$stamp = Get-Date -Format 'yyyyMMddHHmm'
+$html = (Get-Content 'web\index.html' -Raw) -replace '__BUILD__', $stamp
+[System.IO.File]::WriteAllText((Join-Path $PSScriptRoot 'docs\index.html'), $html, (New-Object System.Text.UTF8Encoding($false)))
 Copy-Item 'web\style.css'  'docs\style.css'  -Force
 New-Item -Path 'docs\.nojekyll' -ItemType File -Force | Out-Null
 

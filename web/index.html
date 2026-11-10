@@ -32,10 +32,11 @@
 <script src="src/system.bundle.js" charset="utf-8"> </script>
 
 <!-- Import map -->
-<script src="src/import-map.json" type="systemjs-importmap" charset="utf-8"> </script>
+<!-- __BUILD__ 由 deploy.ps1 替换成部署时间戳，强制浏览器重新下载，避免读到 10 分钟缓存的旧包 -->
+<script src="src/import-map.json?v=__BUILD__" type="systemjs-importmap" charset="utf-8"> </script>
 
 <script>
-    System.import('./index.js').catch(function(err) { console.error(err); })
+    System.import('./index.js?v=__BUILD__').catch(function(err) { console.error(err); })
 </script>
   </body>
 </html>
