@@ -2,6 +2,7 @@ import { _decorator, Component, math, Prefab, Vec3 } from 'cc';
 import { getNode } from './pool';
 import { GameState } from './GameState';
 import { Player } from './Player';
+import { Enemy } from './Enemy';
 
 const { ccclass, property } = _decorator;
 
@@ -34,6 +35,9 @@ export class EnemySpawner extends Component {
 
     @property({ tooltip: '生成半径，要大于屏幕半对角线，保证从屏幕外出生' })
     spawnRadius: number = 2100
+
+    @property({ tooltip: '同屏敌人上限，超过就不再刷（性能护栏）' })
+    maxEnemies: number = 120
 
     // ==================== 二、私有状态 ====================
 
@@ -87,6 +91,10 @@ export class EnemySpawner extends Component {
 
     /** 刷一只普通怪（按概率决定是近战还是远程） */
     private spawnOne(): void {
+        // 性能护栏：场上的敌人已经够多了就不再刷
+        // 否则玩家不打怪时，敌人会无限堆积，drawcall 和逻辑开销一起涨
+        if (Enemy.all.length >= this.maxEnemies) return
+
         // 掷骰子：配了远程预制体、且随机数小于概率 → 这次刷远程怪
         const useShooter = this.shooterPrefab && Math.random() < this.shooterChance
         const prefab = useShooter ? this.shooterPrefab : this.enemy
