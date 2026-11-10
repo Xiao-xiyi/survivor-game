@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Label, Input, input, KeyCode, EventKeyboard, director, sys, profiler } from 'cc';
+import { _decorator, Component, Node, Label, Input, input, KeyCode, EventKeyboard, director, sys} from 'cc';
 import { GameState } from './GameState';
 
 const { ccclass, property } = _decorator;
@@ -29,7 +29,8 @@ export class StartPanel extends Component {
     // ==================== 三、生命周期 ====================
 
     onLoad(): void {
-                profiler.showStats()   // 临时：左下角显示 FPS / Draw call / Game Logic（上线前删掉这行）
+        
+      
         StartPanel.instance = this
 
         // 读存档：localStorage 里存的永远是字符串，必须 Number() 转回数字

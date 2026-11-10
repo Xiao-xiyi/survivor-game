@@ -1025,13 +1025,13 @@
       "__uuid__": "ddbb175a-ef05-400f-9ae8-e58c8ef6c66a",
       "__expectedType__": "cc.Prefab"
     },
-    "shooterChance": 1,
+    "shooterChance": 0.35,
     "bossPrefab": {
       "__uuid__": "63873b38-fd50-4a12-bd14-dc5a6a4eb9a2",
       "__expectedType__": "cc.Prefab"
     },
-    "bossInterval": 15,
-    "spawnInterval": 0.15,
+    "bossInterval": 90,
+    "spawnInterval": 1.5,
     "spawnRadius": 2100,
     "maxEnemies": 120,
     "_id": "ca/BtvWEpO5q4wmIZ7T0L4"
@@ -1400,7 +1400,7 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 36.4609375,
+      "width": 36.45687577736318,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -1433,7 +1433,7 @@
     "_string": "label",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 16,
+    "_actualFontSize": 22.6125,
     "_fontSize": 16,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1484,7 +1484,7 @@
     "__prefab": null,
     "_alignFlags": 9,
     "_target": null,
-    "_left": 59.99796913868159,
+    "_left": 60,
     "_right": 0,
     "_top": 0,
     "_bottom": 0,
@@ -1565,7 +1565,7 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 36.4609375,
+      "width": 36.45687577736318,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -1598,7 +1598,7 @@
     "_string": "label",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 16,
+    "_actualFontSize": 22.6125,
     "_fontSize": 16,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -2313,7 +2313,7 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 63.806640625,
+      "width": 63.80359487285793,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -2346,7 +2346,7 @@
     "_string": "label",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 28,
+    "_actualFontSize": 39.571875,
     "_fontSize": 28,
     "_fontFamily": "Arial",
     "_lineHeight": 40,

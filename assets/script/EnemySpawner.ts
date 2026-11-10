@@ -103,7 +103,7 @@ export class EnemySpawner extends Component {
         const enemy = getNode(prefab)
         // 挂到生成器的父节点下（敌人不该是生成器的子节点，否则会跟着生成器一起动）
         const parent = this.node.parent ?? this.node
-        parent.addChild(enemy)
+        this.node.addChild(enemy)
         enemy.setWorldPosition(this.randomSpawnPos())
     }
 
@@ -113,7 +113,7 @@ export class EnemySpawner extends Component {
 
         const boss = getNode(this.bossPrefab)
         const parent = this.node.parent ?? this.node
-        parent.addChild(boss)
+        this.node.addChild(boss)
         boss.setWorldPosition(this.randomSpawnPos())
     }
 }
