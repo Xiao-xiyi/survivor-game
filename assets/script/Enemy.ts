@@ -1,4 +1,4 @@
-import { _decorator, Component, Collider2D, Prefab, Animation, Vec3 } from 'cc';
+import { _decorator, Component, Collider2D, Prefab, Animation, AnimationState, Vec3 } from 'cc';
 import { getNode, putNode } from './pool';
 import { Player } from './Player';
 import { HitFx } from './HitFx';
@@ -249,6 +249,9 @@ export class Enemy extends Component {
         // 没配子弹预制体就不开枪（近战怪走这里）
         if (!this.bulletPrefab) return
 
+        // 先播开火动画，再生成子弹（播放一次，播完由 onAnimFinished 切回待机）
+        if (this.attackClip && this.anim) this.anim.play(this.attackClip)
+
         const b = getNode(this.bulletPrefab)
         b.setParent(this.node.parent)          // 挂到同一层，保证坐标系一致
         b.setWorldPosition(this.node.worldPosition)   // 从敌人当前位置出生
@@ -328,8 +331,18 @@ export class Enemy extends Component {
         this.scheduleOnce(() => putNode(this.node), 0.6)
     }
 
-    /** 动画播放结束：只有"死亡中"才回池，待机动画结束不该回池 */
-    private onAnimFinished(): void {
-        if (this._dead) putNode(this.node)
+    /** 动画播放结束：死亡 → 回池；攻击 → 切回待机 */
+    private onAnimFinished(type: string, state: AnimationState): void {
+        // 死亡动画播完 → 回收进池子
+        if (this._dead) {
+            putNode(this.node)
+            return
+        }
+
+        // 攻击动画播完 → 回到待机（远程开火、近战挥击都走这里）
+        // state.name 就是 Animation 组件里那条 clip 的名字
+        if (state && state.name === this.attackClip) {
+            if (this.anim && this.idleClip) this.anim.play(this.idleClip)
+        }
     }
 }

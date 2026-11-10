@@ -23,7 +23,7 @@
     "_active": true,
     "_components": [],
     "_prefab": {
-      "__id__": 116
+      "__id__": 119
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -54,7 +54,7 @@
     },
     "autoReleaseAssets": false,
     "_globals": {
-      "__id__": 120
+      "__id__": 123
     },
     "_id": "8d1975c7-b010-4b09-a704-c29aa0ae087e"
   },
@@ -95,16 +95,16 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 112
-      },
-      {
-        "__id__": 113
-      },
-      {
-        "__id__": 114
-      },
-      {
         "__id__": 115
+      },
+      {
+        "__id__": 116
+      },
+      {
+        "__id__": 117
+      },
+      {
+        "__id__": 118
       }
     ],
     "_prefab": null,
@@ -380,9 +380,7 @@
     "cam": {
       "__id__": 4
     },
-    "level": 1,
-    "exp": 0,
-    "expNeed": 5,
+    "speed": 400,
     "bulletPrefab": {
       "__uuid__": "ade191f5-8f6c-4417-8dce-1149f1c1a72a",
       "__expectedType__": "cc.Prefab"
@@ -393,11 +391,13 @@
     "walkAnim": {
       "__id__": 10
     },
+    "level": 1,
+    "exp": 0,
+    "expNeed": 5,
     "hp": 5,
     "maxHp": 5,
     "invincibleTime": 1,
     "_invincibleTicker": 0,
-    "speed": 400,
     "_id": "dejVXnIs9Gr4XeyTghfbyI"
   },
   {
@@ -3919,6 +3919,12 @@
       },
       {
         "__id__": 111
+      },
+      {
+        "__id__": 112
+      },
+      {
+        "__id__": 114
       }
     ],
     "removedComponents": []
@@ -4010,6 +4016,35 @@
       "meleeRange"
     ],
     "value": 130
+  },
+  {
+    "__type__": "CCPropertyOverrideInfo",
+    "targetInfo": {
+      "__id__": 113
+    },
+    "propertyPath": [
+      "_spriteFrame"
+    ],
+    "value": {
+      "__uuid__": "9faafb47-edf5-4d11-b3e1-7fc8fa4259eb@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    }
+  },
+  {
+    "__type__": "cc.TargetInfo",
+    "localID": [
+      "3aBpKKWWlGwJ0CYoMUu1TS"
+    ]
+  },
+  {
+    "__type__": "CCPropertyOverrideInfo",
+    "targetInfo": {
+      "__id__": 110
+    },
+    "propertyPath": [
+      "attackClip"
+    ],
+    "value": "enemy2-attack"
   },
   {
     "__type__": "cc.UITransform",
@@ -4120,7 +4155,7 @@
     "instance": null,
     "targetOverrides": [
       {
-        "__id__": 117
+        "__id__": 120
       }
     ],
     "nestedPrefabInstanceRoots": [
@@ -4135,7 +4170,7 @@
       "__id__": 101
     },
     "sourceInfo": {
-      "__id__": 118
+      "__id__": 121
     },
     "propertyPath": [
       "anim"
@@ -4144,7 +4179,7 @@
       "__id__": 101
     },
     "targetInfo": {
-      "__id__": 119
+      "__id__": 122
     }
   },
   {
@@ -4162,28 +4197,28 @@
   {
     "__type__": "cc.SceneGlobals",
     "ambient": {
-      "__id__": 121
-    },
-    "shadows": {
-      "__id__": 122
-    },
-    "_skybox": {
-      "__id__": 123
-    },
-    "fog": {
       "__id__": 124
     },
-    "octree": {
+    "shadows": {
       "__id__": 125
     },
-    "skin": {
+    "_skybox": {
       "__id__": 126
     },
-    "lightProbeInfo": {
+    "fog": {
       "__id__": 127
     },
-    "postSettings": {
+    "octree": {
       "__id__": 128
+    },
+    "skin": {
+      "__id__": 129
+    },
+    "lightProbeInfo": {
+      "__id__": 130
+    },
+    "postSettings": {
+      "__id__": 131
     },
     "bakedWithStationaryMainLight": false,
     "bakedWithHighpLightmap": false
