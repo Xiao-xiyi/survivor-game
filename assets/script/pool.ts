@@ -25,7 +25,7 @@ export function putNode(node: Node): void {
     if (!_map.has(name)) _map.set(name, [])
     //把节点放进对象池里
     const arr = _map.get(name)!
-    if (arr.includes(node)) return   // 已经在池子里了，别重复放
+    if (arr.indexOf(node) !== -1) return   // 已经在池子里了，别重复放
     arr.push(node)
 
 }

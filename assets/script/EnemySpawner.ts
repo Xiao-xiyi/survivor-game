@@ -1,50 +1,111 @@
 import { _decorator, Component, math, Prefab, Vec3 } from 'cc';
-// 从 pool.ts 引入对象池的取出函数
 import { getNode } from './pool';
 import { GameState } from './GameState';
+import { Player } from './Player';
+
 const { ccclass, property } = _decorator;
 
+/**
+ * 敌人生成器：负责按时间刷小怪、按概率刷远程怪、按间隔刷 Boss
+ * 难度曲线也在这里：存活越久，刷怪间隔越短
+ */
 @ccclass('EnemySpawner')
 export class EnemySpawner extends Component {
-    @property({ type: Prefab, tooltip: '敌人的预制体' })
-    enemy: Prefab = null
-    @property({ tooltip: '生成间隔' })
-    spawnInterval: number = 1.2
-    @property({ tooltip: '生成半径，要大于 2000 让敌人从屏幕外进来' })
-    spawnRadius: number = 2100;
-    private _timer: number = 0;
-    private spawOne(): void {
-        if (!this.enemy) return
-        // 从对象池拿一个敌人节点
-        const enemy = getNode(this.enemy);
-        //添加到父节点下面
-        this.node.addChild(enemy)
-        //随机生成一个角度
-        const angleDeg = Math.random() * 360
-        // 转换成弧度
-        const angleRad = math.toRadian(angleDeg)
-        // 在这个角度方向上、距离 spawnRadius 远的圆周上取一个点
-        const x = Math.cos(angleRad) * this.spawnRadius;
-        const y = Math.sin(angleRad) * this.spawnRadius;
 
-        // 设置敌人的出生位置（世界坐标）
-        enemy.setWorldPosition(new Vec3(x, y, 0));
-    }
+    // ==================== 一、可配置属性 ====================
+
+    @property({ type: Prefab, tooltip: '普通敌人（近战）的预制体' })
+    enemy: Prefab = null
+
+    @property({ type: Prefab, tooltip: '远程怪的预制体' })
+    shooterPrefab: Prefab = null
+
+    @property({ tooltip: '远程怪出现概率 0~1' })
+    shooterChance: number = 0.35
+
+    @property({ type: Prefab, tooltip: 'Boss 预制体' })
+    bossPrefab: Prefab = null
+
+    @property({ tooltip: '每隔多少秒刷一只 Boss' })
+    bossInterval: number = 90
+
+    @property({ tooltip: '初始生成间隔（秒），会随时间变短' })
+    spawnInterval: number = 1.2
+
+    @property({ tooltip: '生成半径，要大于屏幕半对角线，保证从屏幕外出生' })
+    spawnRadius: number = 2100
+
+    // ==================== 二、私有状态 ====================
+
+    /** 普通怪计时器 */
+    private _timer: number = 0
+
+    /** Boss 计时器，和普通刷怪计时器互不干扰 */
+    private _bossTimer: number = 0
+
+    // ==================== 三、每帧逻辑 ====================
+
     protected update(dt: number): void {
-        if (GameState.paused) return 
-        if (!GameState.started) return  
+        if (!GameState.started) return   // 还在开始界面
+        if (GameState.paused) return     // 暂停中
         if (GameState.over) return       // 游戏结束，别再刷怪
+
+        // ---- 普通怪：间隔随存活时间变短，最快 0.45 秒一个 ----
         const cur = Math.max(0.45, this.spawnInterval - GameState.time * 0.02)
-        // 计时器累加这一帧的秒数
         this._timer += dt
+        // 用 while 而不是 if：掉帧时一帧可能要补刷好几只
         while (this._timer > cur) {
             this._timer -= cur
-            //生成一个敌人
-            this.spawOne()
+            this.spawnOne()
         }
 
+        // ---- Boss：固定间隔 ----
+        if (this.bossPrefab) {
+            this._bossTimer += dt
+            if (this._bossTimer >= this.bossInterval) {
+                this._bossTimer = 0
+                this.spawnBoss()
+            }
+        }
     }
 
+    // ==================== 四、内部逻辑 ====================
 
+    /**
+     * 随机出生点：以玩家为圆心、spawnRadius 为半径的圆上取一点
+     * 以玩家为圆心而不是世界原点，否则玩家走到地图边缘时怪会贴脸刷出来
+     */
+    private randomSpawnPos(): Vec3 {
+        const center = Player.instance?.node.position ?? Vec3.ZERO
+        const angleRad = math.toRadian(Math.random() * 360)   // 度 → 弧度
+        return new Vec3(
+            center.x + Math.cos(angleRad) * this.spawnRadius,
+            center.y + Math.sin(angleRad) * this.spawnRadius,
+            0
+        )
+    }
+
+    /** 刷一只普通怪（按概率决定是近战还是远程） */
+    private spawnOne(): void {
+        // 掷骰子：配了远程预制体、且随机数小于概率 → 这次刷远程怪
+        const useShooter = this.shooterPrefab && Math.random() < this.shooterChance
+        const prefab = useShooter ? this.shooterPrefab : this.enemy
+        if (!prefab) return
+
+        const enemy = getNode(prefab)
+        // 挂到生成器的父节点下（敌人不该是生成器的子节点，否则会跟着生成器一起动）
+        const parent = this.node.parent ?? this.node
+        parent.addChild(enemy)
+        enemy.setWorldPosition(this.randomSpawnPos())
+    }
+
+    /** 刷一只 Boss */
+    private spawnBoss(): void {
+        if (!this.bossPrefab) return
+
+        const boss = getNode(this.bossPrefab)
+        const parent = this.node.parent ?? this.node
+        parent.addChild(boss)
+        boss.setWorldPosition(this.randomSpawnPos())
+    }
 }
-

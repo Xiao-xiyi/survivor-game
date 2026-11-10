@@ -193,6 +193,7 @@
       "__uuid__": "45c43938-8a45-42cc-a4cf-4e18ae456726",
       "__expectedType__": "cc.Prefab"
     },
+    "expCount": 1,
     "dmgPrefab": {
       "__uuid__": "4aebff7b-f768-4090-84ef-9f6b2b3cc309",
       "__expectedType__": "cc.Prefab"
@@ -204,6 +205,11 @@
     "deathClip": "enemy-death",
     "hp": 2,
     "speed": 140,
+    "shootInterval": 0,
+    "bulletPrefab": null,
+    "fireRange": 600,
+    "keepDistance": 500,
+    "angleOffset": 0,
     "_id": ""
   },
   {
